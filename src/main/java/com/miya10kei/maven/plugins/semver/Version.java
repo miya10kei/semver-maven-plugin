@@ -1,22 +1,28 @@
 package com.miya10kei.maven.plugins.semver;
 
-import java.util.regex.Pattern;
-
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 
-public class Version {
+import java.util.regex.Pattern;
+
+class Version {
   private static final Pattern pattern = Pattern.compile("^(\\d+).(\\d+).(\\d+)(-SNAPSHOT)?$");
   private String version;
 
-  public Version(String version) {
+  /** Constructor. */
+  Version(String version) {
     if (!pattern.matcher(version).find()) {
       throw new IllegalArgumentException("Illegal version format: " + version);
     }
     this.version = version;
   }
 
-  public String patch() {
+  /**
+   * Update patch version.(e.g. 1.1.1 -> 1.1.2)
+   *
+   * @return updated version
+   */
+  String patch() {
     var m = pattern.matcher(version);
     if (m.find()) {
       return setAndGetVersion(m.group(1), m.group(2), up(m.group(3)), m.group(4) == null);
@@ -24,7 +30,12 @@ public class Version {
     throw new RuntimeException();
   }
 
-  public String minor() {
+  /**
+   * Update minor version.(e.g. 1.1.1 -> 1.2.0)
+   *
+   * @return updated version
+   */
+  String minor() {
     var m = pattern.matcher(version);
     if (m.find()) {
       return setAndGetVersion(m.group(1), up(m.group(2)), "0", m.group(4) == null);
@@ -32,7 +43,12 @@ public class Version {
     throw new RuntimeException();
   }
 
-  public String major() {
+  /**
+   * Update major version.(e.g. 1.1.1 -> 2.0.0)
+   *
+   * @return updated version
+   */
+  String major() {
     var m = pattern.matcher(version);
     if (m.find()) {
       return setAndGetVersion(up(m.group(1)), "0", "0", m.group(4) == null);
@@ -40,7 +56,12 @@ public class Version {
     throw new RuntimeException();
   }
 
-  public String release() {
+  /**
+   * Modify snapshot version to release version.(e.g. 1.1.1-SNAPSHOT -> 1.1.1)
+   *
+   * @return updated version
+   */
+  String release() {
     var m = pattern.matcher(version);
     if (m.find()) {
       return setAndGetVersion(m.group(1), m.group(2), m.group(3), true);
@@ -48,7 +69,12 @@ public class Version {
     throw new RuntimeException();
   }
 
-  public String preRelease() {
+  /**
+   * Modify release version to snapshot version.(e.g. 1.1.1-> 1.1.1-SNAPSHOT)
+   *
+   * @return updated version
+   */
+  String preRelease() {
     var m = pattern.matcher(version);
     if (m.find()) {
       return setAndGetVersion(m.group(1), m.group(2), m.group(3), false);
